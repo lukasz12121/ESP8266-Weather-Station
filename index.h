@@ -68,10 +68,10 @@ tr:nth-child(even) {
   <p>
   <table>
   <tr>
-    <th>Reading type</th>
-    <th>Reading value</th>
-    <th>Units</th>
-    <th>Sensor</th>
+    <th><strong>Reading type</strong></th>
+    <th><strong>Reading value</strong></th>
+    <th><strong>Units</strong></th>
+    <th><strong>Sensor</strong></th>
   </tr>
   <tr>
     <th>Altitude</th>
@@ -326,11 +326,11 @@ function toggleCheckbox(element) {
   var xhr = new XMLHttpRequest();
   if(element.checked){ 
     xhr.open("GET", "/update?state=0", true); 
-    document.getElementById("state").innerHTML = "ON";  
+    document.getElementById("state").innerHTML = "OFF";  
   }
   else { 
     xhr.open("GET", "/update?state=1", true); 
-    document.getElementById("state").innerHTML = "OFF";      
+    document.getElementById("state").innerHTML = "ON";      
   }
   xhr.send();
 }

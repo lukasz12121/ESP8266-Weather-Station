@@ -1,9 +1,9 @@
-#include<Arduino.h>
-#include<ESP8266WiFi.h>
-#include<Hash.h>
-#include<ESPAsyncTCP.h>
-#include<ESPAsyncWebServer.h>
-#include<DHT.h>
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <Hash.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <DHT.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 #include <AsyncMqttClient.h>
@@ -39,12 +39,11 @@ float humidity = 0.0;
 int gas = 0;
 float pressure = 0.0;
 int altitude = 0;
-int Gas_analog = A0;   
+int gas_analog = A0;   
 unsigned long previousMillis = 0;
 unsigned long interval = 10000;
 
-DHT dht(DHTPIN, DHTTYPE);
-Adafruit_BMP280 bmp;
+DHT dht(DHTPIN, DHTTYPE);Adafruit_BMP280 bmp;
 AsyncWebServer server(80);
 AsyncMqttClient mqttClient;
 Ticker mqttReconnectTimer;
@@ -54,10 +53,10 @@ Ticker wifiReconnectTimer;
 
 String relayState(){
   if(digitalRead(RELAY)){
-    return "checked";
+    return "";
   }
   else {
-    return "";
+    return "checked";
   }
   return "";
 }
@@ -164,6 +163,7 @@ void setup(){
   //DHT sensor initialization
   dht.begin();
 
+  
   wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
   wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
   
@@ -173,14 +173,14 @@ void setup(){
   if(!bmp.begin()){
     Serial.printf("\nCould not find BMP80");
     while(1);
-    }
-    bmp.begin();
-    bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
-                    Adafruit_BMP280::SAMPLING_X2,
-                    Adafruit_BMP280::SAMPLING_X16,
-                    Adafruit_BMP280::FILTER_X16,
-                    Adafruit_BMP280::STANDBY_MS_500
-      );
+  }
+    //bmp.begin();
+    /*
+  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
+                  Adafruit_BMP280::SAMPLING_X2,
+                  Adafruit_BMP280::SAMPLING_X16,
+                  Adafruit_BMP280::FILTER_X16,
+                  Adafruit_BMP280::STANDBY_MS_500);*/
     
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
@@ -275,7 +275,7 @@ void loop(){
       Serial.printf("\nCurrent humidity value: %.2f\n", humidity);
     }
     // Read Gas Level
-    int newGas = analogRead(Gas_analog);
+    int newGas = analogRead(gas_analog);
     // if gas level read failed, don't change 'gas' variable value 
     if (isnan(newGas)) {
       Serial.println("Failed to read from MQ-2 sensor!");
@@ -309,6 +309,14 @@ void loop(){
       uint16_t packetIdPub5 = mqttClient.publish(MQTT_PUB_ALT, 1, true, String(altitude).c_str()); 
       Serial.printf("\nPublishing on topic %s at QoS 1, packetId %i\n", MQTT_PUB_ALT, packetIdPub5);
       Serial.printf("\nCurrent altitude value: %i\n", altitude);
+    }
+    if(digitalRead(RELAY)){
+      Serial.println(digitalRead(RELAY));
+      Serial.println("HIGH");
+    }
+    else {
+      Serial.println(digitalRead(RELAY));
+      Serial.println("LOW");
     }
   }
 }
