@@ -325,12 +325,12 @@ setInterval(function ( ) {
 function toggleCheckbox(element) {
   var xhr = new XMLHttpRequest();
   if(element.checked){ 
-    xhr.open("GET", "/update?state=0", true); 
-    document.getElementById("state").innerHTML = "OFF";  
+    xhr.open("GET", "/update?state=1", true); 
+    document.getElementById("state").innerHTML = "ON";  
   }
   else { 
-    xhr.open("GET", "/update?state=1", true); 
-    document.getElementById("state").innerHTML = "ON";      
+    xhr.open("GET", "/update?state=0", true); 
+    document.getElementById("state").innerHTML = "OFF";      
   }
   xhr.send();
 }

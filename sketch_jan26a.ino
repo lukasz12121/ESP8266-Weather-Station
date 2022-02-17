@@ -53,10 +53,10 @@ Ticker wifiReconnectTimer;
 
 String relayState(){
   if(digitalRead(RELAY)){
-    return "";
+    return "checked";
   }
   else {
-    return "checked";
+    return "";
   }
   return "";
 }
@@ -148,7 +148,7 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
   newPayload[len] = '\0';
   strncpy(newPayload, payload, len);
   Serial.printf("\nNew payload: %s\n", newPayload);
-  if((String(topic) == MQTT_PUB_REL) && (String(newPayload) =="ON")){
+  if((String(topic) == MQTT_PUB_REL) && (String(newPayload) =="OFF")){
     digitalWrite(RELAY, LOW);
   }
   else{
