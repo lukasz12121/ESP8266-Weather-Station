@@ -26,7 +26,7 @@
 #define MQTT_PUB_GAS "esp/mq2/gas"
 #define MQTT_PUB_ALT "esp/bmp/altitude"
 #define MQTT_PUB_REL "esp/relay/lamp"
-#define PARAM_INPUT_1 "state"
+//#define PARAM_INPUT_1 "state"
 //DHT11 definitions
 #define DHTPIN 14
 #define DHTTYPE DHT11
@@ -77,19 +77,11 @@ String processor(const String& var){
   else if(var == "ALTITUDE"){
     return String(altitude);
   }
-  else if(var == "BUTTONPLACEHOLDER"){
-    String buttons ="";
+  else if(var == "BUTTON"){
+    String button ="";
     String relayStateValue = relayState();
-    buttons+= "<p><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"output\" " + relayStateValue + "><span class=\"slider\"></span></label></p>";
-    return buttons;
-  }
-  else if(var == "STATE"){
-    if(digitalRead(RELAY)){
-      return "ON";
-    }
-    else {
-      return "OFF";
-    }
+    button= "<p><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"output\" " + relayStateValue + "><span class=\"slider\"></span></label></p>";
+    return button;
   }
   return String();
 }
@@ -158,7 +150,6 @@ void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties 
 void setup(){
   Serial.begin(9600); //115200
   pinMode(RELAY, OUTPUT);
-  //digitalWrite(output, HIGH);
 
   //DHT sensor initialization
   dht.begin();
@@ -207,23 +198,17 @@ void setup(){
   server.on("/logged-out", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", logout_html, processor);
   });
-  // Send a GET request to <ESP_IP>/update?state=<inputMessage>
   server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    if(!request->authenticate(HTTP_USERNAME, HTTP_PASSWORD))
-      return request->requestAuthentication();
-    String inputMessage;
-    String inputParam;
-    // GET input1 value on <ESP_IP>/update?state=<inputMessage>
-    if (request->hasParam(PARAM_INPUT_1)) {
-      inputMessage = request->getParam(PARAM_INPUT_1)->value();
-      inputParam = PARAM_INPUT_1;
-      digitalWrite(RELAY, inputMessage.toInt());
+    String inputValue;
+
+    if (request->hasParam("state")) {
+      inputValue = request->getParam("state")->value();
+      Serial.println(inputValue);
+      digitalWrite(RELAY, inputValue.toInt());
     }
     else {
-      inputMessage = "No message sent";
-      inputParam = "none";
+      Serial.println("No value provided");
     }
-    Serial.println(inputMessage);
     request->send(200, "text/plain", "OK");
   });
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){

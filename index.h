@@ -62,8 +62,8 @@ tr:nth-child(even) {
 <body>
   <h2>ESP8266 HTTP Server</h2>
   <button class="button" onclick="logoutButton()">Logout</button>
-  <p>Light switch - <span id="state">%STATE%</span></p>
-  %BUTTONPLACEHOLDER%
+  <p>Light switch</p>
+  %BUTTON%
   <h3>Current values(refresh every 10 sec)</h3>
   <p>
   <table>
@@ -325,12 +325,10 @@ setInterval(function ( ) {
 function toggleCheckbox(element) {
   var xhr = new XMLHttpRequest();
   if(element.checked){ 
-    xhr.open("GET", "/update?state=1", true); 
-    document.getElementById("state").innerHTML = "ON";  
+    xhr.open("GET", "/update?state=1", true);  
   }
   else { 
-    xhr.open("GET", "/update?state=0", true); 
-    document.getElementById("state").innerHTML = "OFF";      
+    xhr.open("GET", "/update?state=0", true);
   }
   xhr.send();
 }
