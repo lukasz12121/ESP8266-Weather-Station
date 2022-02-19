@@ -25,7 +25,7 @@
 #define MQTT_PUB_PRES "esp/bmp/pressure"
 #define MQTT_PUB_GAS "esp/mq2/gas"
 #define MQTT_PUB_ALT "esp/bmp/altitude"
-#define MQTT_PUB_REL "esp/relay/lamp"
+#define MQTT_SUB_REL "esp/relay/lamp"
 //#define PARAM_INPUT_1 "state"
 //DHT11 definitions
 #define DHTPIN 14
@@ -104,21 +104,23 @@ void onWifiConnect(const WiFiEventStationModeGotIP& event) {
 
 void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
   Serial.printf("\nDisconnected from Wi-Fi.");
-  mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
-  wifiReconnectTimer.once(2, connectToWifi);
+  //mqttReconnectTimer.detach(); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
+  //wifiReconnectTimer.once(2, connectToWifi);
+  connectToWifi();
 }
 
 void onMqttConnect(bool sessionPresent) {
   Serial.printf("\nConnected to MQTT.");
   Serial.printf("\nSession present: %s", sessionPresent ? "true" : "false");
-  uint16_t packetIdSub1  = mqttClient.subscribe(MQTT_PUB_REL, 1);
+  uint16_t packetIdSub1  = mqttClient.subscribe(MQTT_SUB_REL, 1);
   Serial.printf("\nSubscribing on topic %s, packetId: %i\n", MQTT_PUB_PRES, packetIdSub1);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   Serial.printf("\nDisconnected from MQTT.");
   if (WiFi.isConnected()) {
-    mqttReconnectTimer.once(2, connectToMqtt);
+    //mqttReconnectTimer.once(2, connectToMqtt);
+    connectToMqtt();
   }
 }
 
@@ -126,25 +128,19 @@ void onMqttPublish(uint16_t packetId) {
   Serial.printf("\nPublish acknowledged - packetId: %i\n", packetId);
 }
 
-void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-  Serial.printf("\nSubscribe acknowledged - packetId: %i, qos: %i\n", packetId, qos);
-}
-
-void onMqttUnsubscribe(uint16_t packetId) {
-  Serial.printf("\nUnsubscribe acknowledged - packetId: %i\n", packetId);
-}
-
 void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  Serial.printf("\nMessage - topic: %s, payload: %s\n", topic, payload);
+  Serial.printf("\nMessage subscribed- topic: %s, payload: %s\n", topic, payload);
   char newPayload[len+1];
   newPayload[len] = '\0';
   strncpy(newPayload, payload, len);
   Serial.printf("\nNew payload: %s\n", newPayload);
-  if((String(topic) == MQTT_PUB_REL) && (String(newPayload) =="OFF")){
-    digitalWrite(RELAY, LOW);
-  }
-  else{
-    digitalWrite(RELAY, HIGH);
+  if((String(topic) == MQTT_SUB_REL)){
+    if(String(newPayload) =="OFF"){
+      digitalWrite(RELAY, LOW);
+    }
+    else{
+      digitalWrite(RELAY, HIGH);
+    }
   }
 }
 void setup(){
@@ -165,18 +161,9 @@ void setup(){
     Serial.printf("\nCould not find BMP80");
     while(1);
   }
-    //bmp.begin();
-    /*
-  bmp.setSampling(Adafruit_BMP280::MODE_NORMAL,
-                  Adafruit_BMP280::SAMPLING_X2,
-                  Adafruit_BMP280::SAMPLING_X16,
-                  Adafruit_BMP280::FILTER_X16,
-                  Adafruit_BMP280::STANDBY_MS_500);*/
-    
+
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onSubscribe(onMqttSubscribe);
-  mqttClient.onUnsubscribe(onMqttUnsubscribe);
   mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
