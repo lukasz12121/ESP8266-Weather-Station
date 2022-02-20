@@ -4,8 +4,7 @@ const char logout_html[] PROGMEM = R"rawliteral(
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <p>Logged out or <a href="/">return to homepage</a>.</p>
-  <p><strong>Note:</strong> close all web browser tabs to complete the logout process.</p>
+  <p>You have been logged out <a href="/">Return to homepage</a>.</p>
 </body>
 </html>
 )rawliteral";
