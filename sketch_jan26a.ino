@@ -52,10 +52,6 @@ int altitude = 0;
 //mq-2 sensor pin
 int gas_analog = A0;   
 
-//variables for sensor reading interal purposes
-unsigned long previousMillis = 0;
-unsigned long interval = 10000;
-
 //dht object initialization
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -280,10 +276,7 @@ void setup(){
 }
  
 void loop(){
-  //setting logic for sensor reading interval
-  unsigned long currentMillis = millis();
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
+    delay(10000);
 
     //publishing for test purposes MQTT_PUB_TEST
     uint16_t packetIdPub0 = mqttClient.publish(MQTT_PUB_TEST, 1, true, String("test").c_str());
@@ -354,5 +347,4 @@ void loop(){
       Serial.printf("\nPublishing on topic %s at QoS 1, packetId %i\n", MQTT_PUB_ALT, packetIdPub5);
       Serial.printf("\nCurrent altitude value: %i\n", altitude);
     }
-  }
 }
