@@ -214,14 +214,17 @@ void setup(){
     if(!request->authenticate(HTTP_USERNAME, HTTP_PASSWORD))
       return request->requestAuthentication();
     request->send_P(200, "text/html", index_html, processor);
+    Serial.printf("\nRequest on URL / sent successfully");
   });
   //logout from web page request
   server.on("/logout", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(401);
+    Serial.printf("\nRequest on URL /logout sent successfully");
   });
   //logout page upload request
   server.on("/logged-out", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", logout_html, processor);
+    Serial.printf("\nRequest on URL /logged-out sent successfully");
   });
   //relay module state update request
   server.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
@@ -236,26 +239,32 @@ void setup(){
       Serial.println("No value provided");
     }
     request->send(200, "text/plain", "OK");
+    Serial.printf("\nRequest on URL /update sent successfully");
   });
   //temperature value sending to web page request
   server.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(temperature).c_str());
+    Serial.printf("\nRequest on URL /temperature sent successfully");
   });
   //humidity value sending to web page request
   server.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(humidity).c_str());
+    Serial.printf("\nRequest on URL /humidity sent successfully");
   });
   //gas/smoke level value sending to web page request
   server.on("/gas_level", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(gas).c_str());
+    Serial.printf("\nRequest on URL /gas_level sent successfully");
   });
   //pressure values sending to web page request
   server.on("/pressure", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(pressure).c_str());
+    Serial.printf("\nRequest on URL /pressure sent successfully");
   });
   //altitude value sending to web page request
   server.on("/altitude", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", String(altitude).c_str());
+    Serial.printf("\nRequest on URL /altitude sent successfully");
   });
   
  //http server initialization
