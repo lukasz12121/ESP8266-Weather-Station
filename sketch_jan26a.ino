@@ -29,9 +29,11 @@
 #define MQTT_PUB_PRES "esp/bmp/pressure"
 #define MQTT_PUB_GAS "esp/mq2/gas"
 #define MQTT_PUB_ALT "esp/bmp/altitude"
+#define MQTT_PUB_TEST "esp/pub/test"
 
 //subscribed topics
 #define MQTT_SUB_REL "esp/relay/lamp"
+#define MQTT_SUB_TEST "esp/sub/test"
 
 //DHT11 definitions
 #define DHTPIN 14
@@ -137,8 +139,13 @@ void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
 void onMqttConnect(bool sessionPresent) {
   Serial.printf("\nConnected to MQTT.");
   Serial.printf("\nSession present: %s", sessionPresent ? "true" : "false");
+
+  //subscribing MQTT_SUB_REL topic
   uint16_t packetIdSub1  = mqttClient.subscribe(MQTT_SUB_REL, 1);
-  Serial.printf("\nSubscribing on topic %s, packetId: %i\n", MQTT_PUB_PRES, packetIdSub1);
+  Serial.printf("\nSubscribing on topic %s, packetId: %i\n", MQTT_SUB_REL, packetIdSub1);
+  //subscribing MQTT_SUB_TEST topic for test purposes
+  uint16_t packetIdSub2  = mqttClient.subscribe(MQTT_SUB_TEST, 1);
+  Serial.printf("\nSubscribing on topic %s, packetId: %i\n", MQTT_SUB_TEST, packetIdSub2);
 }
 
 //registration of function to handle mqqt broker disconnection event
@@ -278,6 +285,10 @@ void loop(){
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
+    //publishing for test purposes MQTT_PUB_TEST
+    uint16_t packetIdPub0 = mqttClient.publish(MQTT_PUB_TEST, 1, true, String("test").c_str());
+    Serial.printf("\nPublishing on topic %s at QoS 1, packetId: %i\n", MQTT_PUB_TEST, packetIdPub0);
+    
     //read temperature
     float newTemperature = dht.readTemperature();
     // if temperature read failed, don't change 'temperature' variable value
